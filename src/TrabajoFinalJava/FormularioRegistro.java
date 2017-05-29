@@ -13,6 +13,10 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -24,7 +28,7 @@ import javax.swing.JTextField;
  * @author solera
  */
 public class FormularioRegistro {
-
+  String direccionLocal="";
     
     public void registro(){
         Herramientas hr = new Herramientas();         
@@ -100,17 +104,11 @@ public class FormularioRegistro {
                     gbc.gridwidth = 1;
                     gbc.gridheight = 1;
                     gbc.weighty = 0.1; // La fila 0 debe estirarse, le ponemos un 1.0
-                    gbc.fill = GridBagConstraints.HORIZONTAL ;
+                    gbc.fill = GridBagConstraints.NONE ;
                     principal.add (tituloVentana,gbc);
 
 
-                    gbc.gridx = 1;
-                    gbc.gridy = 1;
-                    gbc.gridwidth = 1;
-                    gbc.gridheight = 1;
-                    gbc.weighty = 0.1; // La fila 0 debe estirarse, le ponemos un 1.0
-                    gbc.fill = GridBagConstraints.HORIZONTAL ;
-                    principal.add (tituloVentana,gbc);
+                    
 
                     gbc.gridx = 0;
                     gbc.gridy = 2;
@@ -285,29 +283,33 @@ public class FormularioRegistro {
                      try{
                         enviar.addActionListener(new ActionListener(){
                                 public void actionPerformed(ActionEvent e){
-                                   
+                        
+                        //obtener ip del ordenador local     
+                        try {
+                            direccionLocal=InetAddress.getLocalHost().getHostAddress();
+                            System.out.println(direccionLocal);
+                        } catch (UnknownHostException ex) {
+                            Logger.getLogger(InicioSesion.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                                    
                                     String nombre = nomRealIn.getText();
                                     String apellido = apellidosIn.getText();
                                     String correo =  mailIn.getText();
                                     String usuario =  nomUserIn.getText();
                                     String pass =  passIn.getText();
                                     String pass2 = pass2In.getText();
-                                    
-                                     if(passIn.getText().equals(pass2In.getText())){
+                                    String ip = direccionLocal;
+                                     if(passIn.getText().equals(pass2In.getText())&&!"".equals(passIn.getText())){
                                          
-                                         Registro reg = new Registro(nombre, apellido, correo, usuario, pass);
+                                         Registro reg = new Registro(nombre, apellido, correo, usuario, pass, ip);
                                          
                                          reg.start();
                                          
                                          if(verificarReg==1){
                                              System.out.println("Usuario registrado correctamente.");
                                               
-                                             
                                          }
-                                         
-                                         
-                                         
-                                         
+                                        
                                      }
                                     
                                  

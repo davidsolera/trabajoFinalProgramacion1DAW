@@ -19,7 +19,7 @@ public class Usuarios {
     private int nDescargas;
     private int nSubidas;
     
-      public Usuarios( ){
+    public Usuarios( ){
        
     }
     public Usuarios(String nombre, String apellido, String password, String usuario, String email, int bajadas, int subidas ){

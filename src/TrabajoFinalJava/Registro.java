@@ -8,25 +8,24 @@ package TrabajoFinalJava;
 import static TrabajoFinalJava.ValidarUsuario.stmt;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.util.ArrayList;
+
 
 /**
  *
  * @author solera
  */
 public class Registro extends Thread  {
-    String nombre, apellido, correo, usuario, pass;
+    String nombre, apellido, correo, usuario, pass, ip;
     static int verificarReg;        
     
-    public Registro( String nombre, String apellido, String correo, String usuario, String pass){
+    public Registro( String nombre, String apellido, String correo, String usuario, String pass, String ip){
         
         this.nombre=nombre;
         this.apellido=apellido;
         this.correo=correo;
         this.usuario=usuario;
         this.pass=pass;
-           
+        this.ip=ip;
     }
     
     
@@ -47,7 +46,7 @@ public class Registro extends Thread  {
                 stmt=conn.createStatement();			
 
                
-                String sql = "INSERT INTO `usuarios` (`nombre`, `apellido`, `mail`, `usuario`, `contrasenya`) VALUES ('"+ nombre + "', '"+apellido+ "', '"+correo+"', '"+usuario +"', '"+pass+"');";
+                String sql = "INSERT INTO `usuarios` (`nombre`, `apellido`, `mail`, `usuario`, `contrasenya`, `ip`) VALUES ('"+ nombre + "', '"+apellido+ "', '"+correo+"', '"+usuario +"', '"+pass+"', '"+ ip + "');";
                 stmt.executeUpdate(sql);
 
                 System.out.print("Insertado Correctamente");

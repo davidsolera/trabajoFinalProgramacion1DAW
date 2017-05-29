@@ -5,11 +5,7 @@
  */
 package TrabajoFinalJava;
 
-import static TrabajoFinalJava.ListarUsuarios.numeroUsuarios;
 import static TrabajoFinalJava.ListarUsuarios.usersGeneral;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.Statement;
 
 /**
@@ -21,12 +17,14 @@ public class ValidarUsuario extends Thread {
     String password="";
     static Statement  stmt;
     static int verificado=0;
+    static String usuarioLog;
+    static int subidasUsuarioLog;
+    static int descargasUsuarioLog;
     ListarUsuarios listarUsers = new ListarUsuarios();
    
     Herramientas hr = new Herramientas();     
     
     public ValidarUsuario(){
-        
         
     }
     
@@ -35,15 +33,12 @@ public class ValidarUsuario extends Thread {
         this.password=pass;
     }
     
-    
-    
      public void run(){
         listarUsers.start();
         while(listarUsers.isAlive()){
             System.out.println("Obteniendo listado de usuarios...");
             
         }
-        
         
         System.out.println(usersGeneral.get(0));
         for(int i=0;i<usersGeneral.size();i++){
@@ -52,9 +47,11 @@ public class ValidarUsuario extends Thread {
              if(usersGeneral.get(i).getUsuario().equals(nombre)&&usersGeneral.get(i).getPassword().equals(password)){
                  verificado=1;
                  System.out.println(verificado);
+                 usuarioLog=usersGeneral.get(i).getUsuario();
+                 subidasUsuarioLog=usersGeneral.get(i).getnSubidas();
+                 descargasUsuarioLog=usersGeneral.get(i).getnDescargas();
              }
                 
-             
          }
        
      }

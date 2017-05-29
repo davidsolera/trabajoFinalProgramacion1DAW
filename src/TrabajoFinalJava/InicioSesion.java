@@ -11,15 +11,19 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import static java.time.Clock.system;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import static TrabajoFinalJava.ValidarUsuario.verificado;
+import static TrabajoFinalJava.ValidarUsuario.usuarioLog;
+import static TrabajoFinalJava.ValidarUsuario.descargasUsuarioLog;
+import static TrabajoFinalJava.ValidarUsuario.subidasUsuarioLog;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 /**
  *
  * @author solera
@@ -28,7 +32,7 @@ public class InicioSesion {
     //************************INICIO****INTERFAZ**************************************************************************
 Herramientas hr = new Herramientas();         
 FormularioRegistro reg = new FormularioRegistro();
-ValidarUsuario valUser = new ValidarUsuario();
+FormularioAccesoFtp inicioFtp = new FormularioAccesoFtp();
 
     public void inicioSesion(){	
 
@@ -36,7 +40,7 @@ ValidarUsuario valUser = new ValidarUsuario();
 
         JFrame principal = new JFrame ("GESTOR DESCARGAS");
         //Colores
-
+        
 
         Color nuevoColor = new Color(167, 220, 231);
 
@@ -58,7 +62,7 @@ ValidarUsuario valUser = new ValidarUsuario();
         JButton salir = new JButton ("Salir");
         JLabel nom = new JLabel ("Introduce tu nombre.");
         JLabel pass = new JLabel ("Introduce tu password.");
-        JLabel pass2 = new JLabel ("Repite tu password.");
+       
         JLabel fecha = new JLabel (hr.fechaInterfaz());
 
         JTextField nomIn = new JTextField("");
@@ -92,17 +96,10 @@ ValidarUsuario valUser = new ValidarUsuario();
         gbc.gridwidth = 1;
         gbc.gridheight = 1;
         gbc.weighty = 0.1; // La fila 0 debe estirarse, le ponemos un 1.0
-        gbc.fill = GridBagConstraints.HORIZONTAL ;
+        gbc.fill = GridBagConstraints.NONE ;
         principal.add (tituloVentana,gbc);
 
 
-        gbc.gridx = 1;
-        gbc.gridy = 1;
-        gbc.gridwidth = 1;
-        gbc.gridheight = 1;
-        gbc.weighty = 0.1; // La fila 0 debe estirarse, le ponemos un 1.0
-        gbc.fill = GridBagConstraints.HORIZONTAL ;
-        principal.add (tituloVentana,gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 2;
@@ -136,23 +133,6 @@ ValidarUsuario valUser = new ValidarUsuario();
         gbc.fill = GridBagConstraints.HORIZONTAL ;
         principal.add (passIn,gbc);
 
-        gbc.gridx = 0;
-        gbc.gridy = 4;
-        gbc.gridwidth = 1;
-        gbc.gridheight = 1;
-        gbc.weighty = 0.1; // La fila 0 debe estirarse, le ponemos un 1.0
-        gbc.fill = GridBagConstraints.HORIZONTAL ;
-        principal.add (pass2,gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 4;
-        gbc.gridwidth = 1;
-        gbc.gridheight = 1;
-        gbc.weighty = 0.1; // La fila 0 debe estirarse, le ponemos un 1.0
-        gbc.fill = GridBagConstraints.HORIZONTAL ;
-        principal.add (pass2In,gbc);
-
-        
         gbc.gridx = 1;
         gbc.gridy = 5;
         gbc.gridwidth = 1;
@@ -180,8 +160,6 @@ ValidarUsuario valUser = new ValidarUsuario();
         principal.add (irRegistro,gbc);
 
 
-
-
         gbc.gridx = 1;
         gbc.gridy = 7;
         gbc.gridwidth = 1;
@@ -189,8 +167,6 @@ ValidarUsuario valUser = new ValidarUsuario();
         gbc.weighty = 0.1; // La fila 0 debe estirarse, le ponemos un 1.0
         gbc.fill = GridBagConstraints.HORIZONTAL ;
         principal.add (salir,gbc);
-
-
 
 
         gbc.gridx = 1;
@@ -209,41 +185,53 @@ ValidarUsuario valUser = new ValidarUsuario();
         principal.setLocationRelativeTo(null); 
         principal.setResizable(false);
         //principal.pack();
-
+        
+        //obtener ip del ordenador local     
+        try {
+            String ip=InetAddress.getLocalHost().getHostAddress();
+            System.out.println("La ip es: "+ip);
+        } catch (UnknownHostException ex) {
+            Logger.getLogger(InicioSesion.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
 
         try{
             enviar.addActionListener(new ActionListener(){
                     public void actionPerformed(ActionEvent e){
 
+                            if(!"".equals(nomIn.getText())&&!"".equals(passIn.getText())){
+                                String nombre = nomIn.getText();
+                                String password = passIn.getText();
+                                ValidarUsuario valUser = new ValidarUsuario(nombre, password);
+                                hr.muestra(nombre);
+                                hr.muestra(password);
 
+                                valUser.start();
 
-                        if(passIn.getText().equals(pass2In.getText())){
-                            String nombre = nomIn.getText();
-                            String password = passIn.getText();
-                            ValidarUsuario valUser = new ValidarUsuario(nombre, password);
-                            hr.muestra(nombre);
-                            hr.muestra(password);
-                            valUser.start();
-                           while(valUser.isAlive()){
-                               System.out.println("aun esta validando...");
+                               while(valUser.isAlive()){
+                                   System.out.println("aun esta validando...");
 
-                           }
+                               }
 
-                            if(verificado==1){
-                               hr.muestra("El usuario es correcto, puede continuar");
+                                if(verificado==1){
 
+                                   inicioFtp.inicioFtp();
+                                   principal.setVisible(false);
+                                   hr.muestra("El usuario es correcto, puede continuar");
+                                   hr.muestra("El usuario actual es: "+usuarioLog);
+                                   hr.muestra("El usuario actual tiene un total de: "+descargasUsuarioLog+" descargas por utilizar");
+                                   hr.muestra("El usuario actual tiene un total de: "+subidasUsuarioLog+" subidas por utilizar");
 
-                            }else{
-                               hr.muestra("El usuario no existe o la contraseña es incorrecta...");
-                               error.setVisible(true);
-                               
-                            }
+                                }else{
+                                   hr.muestra("El usuario no existe o la contraseña es incorrecta...");
+                                   error.setVisible(true);
+
+                                }
 
                         }else{
-                            passIn.setBackground(Color.red);
-                            pass2In.setBackground(Color.red);
-                        }
+                                nomIn.setText("No puede estar vacio");
+                                passIn.setText("No puede estar vacio");
+                            }
 
                     }
 
