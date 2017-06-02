@@ -27,7 +27,7 @@ import static TrabajoFinalJava.ValidarUsuario.usuarioLog;
 import static TrabajoFinalJava.ValidarUsuario.descargasUsuarioLog;
 import static TrabajoFinalJava.ValidarUsuario.stmt;
 import org.apache.commons.net.ftp.FTPFile;
-
+import static TrabajoFinalJava.CrearListaFicheros.arrayArchivos;
 /**
  *
  * @author solera
@@ -57,7 +57,7 @@ import org.apache.commons.net.ftp.FTPFile;
         
         @Override
         public void run(){
-                   listarFicheros();
+                   
             
         //************************INICIO****INTERFAZ**************************************************************************
 
@@ -170,7 +170,7 @@ import org.apache.commons.net.ftp.FTPFile;
                 public void actionPerformed(ActionEvent e){
                     
                     
-                        if(descargasUsuarioLog>0){
+                        if(descargasUsuarioLog<=9){
                             try{
                                 cFtp.connect(ftpSsrver);
                                 boolean login = cFtp.login(ftpUser, ftpPass);
@@ -181,64 +181,88 @@ import org.apache.commons.net.ftp.FTPFile;
                                 nombreFichero= nombreArchivoIn.getText();
                                 nombrePc= nombreArchivoIn.getText();
 
-                                FileOutputStream fos = new FileOutputStream(nombrePc);
                                 
-                                File fichero = new File(nombreFichero);
-                                
-                                System.out.println("El tamaño del fichero a descargar es de: "+fichero.length());
-                                
-                                
-                                if(fichero.length()>1000000){
-                                    System.out.println("El fichero es demasiado grande...");
-                                }else{
+                               
                                    
-                                    cFtp.retrieveFile(nombreFichero, fos);
-
-                                    System.out.println("");
-                                    System.out.println("Archivo recibido");
-
-                                    descargasUsuarioLog=descargasUsuarioLog-1;
-                                    System.out.println(descargasUsuarioLog);
-
-
-
-
-
-                                    //modificamos las descargas totales del usuario en la BBDD
-                                    Connection conn;
-
-                                    try{
-                                        try{
-                                           Class.forName("com.mysql.jdbc.Driver");
-                                        } catch (Exception y){
-                                           y.printStackTrace();
-                                        }
-
-
-
-                                        conn = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/midb","root", "");
-                                        System.out.println("Conn OK!");
-
-                                        stmt=conn.createStatement();			
-
-
-
-                                        stmt.executeUpdate("UPDATE usuarios SET bajadas = '"+descargasUsuarioLog+"' WHERE usuario = '"+usuarioLog+"';");
-
-
-                                        System.out.print("Descargas modificadas correctamente.");
-
-                                        conn.close();
-                                    }catch(Exception i){System.out.println(e);}
+                               
+                               
+                                CrearListaFicheros listarFicheros = new CrearListaFicheros();
+                                listarFicheros.start();
+                                
+                                for(int i=0;i<CrearListaFicheros.arrayArchivos.size();i++){
+                                   
+                                   System.out.println(CrearListaFicheros.arrayArchivos.get(i));
+                                   
+                               }
+                                   
+                                
+                                
+                                
+                                
+                                if(CrearListaFicheros.arrayArchivos.contains(nombreFichero)){
+                                    FTPFile file = cFtp.mlistFile(nombreFichero);
+                                    long size = file.getSize();
+                                    System.out.println("Tamaño del fichero= " + size);
                                     
+                                    if(size>1000000){
+                                        System.out.println("El fichero es muy grande......");
+                                    }else{
+
+                                            FileOutputStream fos = new FileOutputStream(nombreFichero);
+                                            cFtp.retrieveFile(nombreFichero, fos);
+
+                                            System.out.println("");
+                                            System.out.println("Archivo recibido");
+
+                                             nombreArchivoIn.setBackground(Color.green);
+                                            descargasUsuarioLog=descargasUsuarioLog+1;
+                                            System.out.println(descargasUsuarioLog);
+
+
+                                            //modificamos las descargas totales del usuario en la BBDD
+                                            Connection conn;
+
+                                            try{
+                                                try{
+                                                   Class.forName("com.mysql.jdbc.Driver");
+                                                } catch (Exception y){
+                                                   y.printStackTrace();
+                                                }
+
+
+
+                                                conn = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/midb","root", "");
+                                                System.out.println("Conn OK!");
+
+                                                stmt=conn.createStatement();			
+
+
+
+                                                stmt.executeUpdate("UPDATE usuarios SET bajadas = '"+descargasUsuarioLog+"' WHERE usuario = '"+usuarioLog+"';");
+
+
+                                                System.out.print("Descargas modificadas correctamente.");
+
+                                                conn.close();
+                                            }catch(Exception i){System.out.println(e);}
+                                    }
+                                    
+                            }else{
+                                    System.out.println("El fichero no existe...");
+                                     nombreArchivoIn.setText("El fichero no existe");
                                 }
+                                
                                     
 
                             }catch(IOException r){
                                 r.printStackTrace(); 
                             }
 
-                    }else{System.out.println("No te quedan descargas... por favor comuniquese con el administrador del servidor. Gracias.");}
+                    }else{
+                        System.out.println("No te quedan descargas... por favor comuniquese con el administrador del servidor. Gracias.");
+                         nombreArchivoIn.setText("No te quedan descargas... por favor comuniquese con el administrador del servidor. Gracias.");
+                        
+                        }
 
 
                     
@@ -271,63 +295,8 @@ import org.apache.commons.net.ftp.FTPFile;
              });
             
         }
-        
-    public void listarFicheros(){
-        
-        String ftpSsrver = "127.0.0.1"; 
-        String ftpUser = "solera";
-        String ftpPass = "solera";
-        
-        
-        
-        FTPClient cFtp = new FTPClient();
-        
-        try{
-            
-            cFtp.connect(ftpSsrver);
-            boolean login = cFtp.login(ftpUser, ftpPass);
-            System.out.print("conexion ftp para ver ficheros establecida");
-            
-           cFtp.enterLocalPassiveMode();
-            
-           
-            
-            String []archivos = cFtp.listNames();
-            FTPFile[] detalles = cFtp.listFiles();
-            
-            
-            /*
-            for(int i=0;i<archivos.length;i++ ){
-               System.out.println(archivos[i]);
-                
-            }
-           */
-         
-            archivos = cFtp.listNames();
-           
-            
-            for(int i=0;i<archivos.length;i++ ){
-                
-            arrayArchivos.add(detalles[i].toString());
-                
-                System.out.println(detalles[i].getSize());
-               //System.out.println(arrayArchivos.get(i));
-            }
-            
-            /*
-            for(int i= 0; i>arrayArchivos.size();i++){
-                cajaFicheros.setText(detalles.toString());
-                System.out.println(detalles.toString());
-          }
-            */
-            
-            cFtp.logout();
-            cFtp.disconnect();
-            System.out.println("Conexion Finalizada, buenas tardes.");
-        } catch(IOException ioe){ System.out.println("error"+ioe.toString()); }
-        
-    }
-        
+      
+   
         
         
         

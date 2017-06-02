@@ -145,7 +145,7 @@ public class FormularioAccesoFtp {
                     gbc.gridwidth = 1;
                     gbc.gridheight = 1;
                     gbc.weighty = 0.0;
-                    gbc.fill = GridBagConstraints.SOUTH ;
+                    gbc.fill = GridBagConstraints.NONE ;
                     principal.add (cerrarSesion,gbc);
                     
                     
@@ -160,15 +160,15 @@ public class FormularioAccesoFtp {
                     
                     //Hace visible el panel
                     principal.setVisible(true);
-                    principal.setSize(650, 350);
+                    principal.setSize(750, 350);
                     principal.setLocationRelativeTo(null); 
                     principal.setResizable(false);
                     //principal.pack();
                     
                     
                     usuarioActual.setText("El usuario actual es: "+usuarioLog);
-                    descargas.setText("Te quedan "+descargasUsuarioLog+" descargas.");
-                    subidas.setText("Te quedan "+subidasUsuarioLog +" subidas.");
+                    descargas.setText("Has usado "+descargasUsuarioLog+" descargas de las 10 totales.");
+                    subidas.setText("Has usado "+subidasUsuarioLog +" subidas de las 5 totales.");
         
         try{
             
@@ -208,6 +208,30 @@ public class FormularioAccesoFtp {
             
             
         });
+         
+         subida.addActionListener(new ActionListener(){
+                public void actionPerformed(ActionEvent e){
+                 
+                 SubirFicheros subida = new SubirFicheros();
+                 
+                    
+                   
+                    subida.start();
+                    principal.setVisible(false);
+                }
+            
+            
+        });
+           
+              salir.addActionListener(new ActionListener(){
+                  public void actionPerformed(ActionEvent e){
+                  
+                      System.exit(1000);
+                  
+                  }
+                  
+             });
+        
         
     }
     

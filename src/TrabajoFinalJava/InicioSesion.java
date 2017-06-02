@@ -67,7 +67,6 @@ FormularioAccesoFtp inicioFtp = new FormularioAccesoFtp();
 
         JTextField nomIn = new JTextField("");
         JPasswordField passIn = new JPasswordField("");
-        JPasswordField pass2In = new JPasswordField("");
         JTextField error = new JTextField("El usuario o la contraseña es incorrecta, vuelve a intentarlo o pulse el boton REGISTRARSE.");
 
 

@@ -185,9 +185,12 @@ public class FormularioVerFicheros extends Thread{
 
 
                                 for(int i=0;i<archivos.length;i++ ){
-
+                                    /*
+                                    cajaFicheros.selectAll();
+                                    cajaFicheros.replaceSelection("");
+                                    */
                                     arrayArchivos.add(archivos[i].toString());
-                                   System.out.println(arrayArchivos.get(i));
+                                    System.out.println(arrayArchivos.get(i));
                                     cajaFicheros.append(System.getProperty("line.separator"));
                                     cajaFicheros.append(arrayArchivos.get(i));
                                     

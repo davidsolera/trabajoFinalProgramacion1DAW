@@ -17,7 +17,7 @@ import org.apache.commons.net.ftp.FTPFile;
  */
 public class CrearListaFicheros extends Thread{
         static ArrayList<String> arrayArchivos = new ArrayList<String>();
-        
+        static ArrayList<String> arrayArchivosDetalles = new ArrayList<String>();
         @Override
         public void run(){
            
@@ -42,27 +42,15 @@ public class CrearListaFicheros extends Thread{
             String []archivos = cFtp.listNames();
             FTPFile[] detalles = cFtp.listFiles();
             
-            /*
-            for(int i=0;i<archivos.length;i++ ){
-                System.out.println(archivos[i]);
-                
-            }
-           */
-           
             archivos = cFtp.listNames();
            
-            
             for(int i=0;i<archivos.length;i++ ){
                 
                 arrayArchivos.add(archivos[i]);
-               // System.out.println("Mostrando arrayArchivos.get(i)"+arrayArchivos.get(i));
+                arrayArchivosDetalles.add(archivos[i]);
+              
             }
-            /*
-            for(int i=0;i<detalles.length;i++ ){
-                System.out.println(detalles[i].toString());
-                
-            }
-            */
+            
             cFtp.logout();
             cFtp.disconnect();
             System.out.println("Conexion Finalizada, buenas tardes.");
